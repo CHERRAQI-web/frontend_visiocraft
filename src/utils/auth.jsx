@@ -4,7 +4,7 @@ import axios from "axios";
 export const isAuthenticated = async () => {
   try {
     // On ajoute un paramètre unique (timestamp) à chaque appel pour contourner le cache du navigateur
-    const response = await axios.get(`http://localhost:8080/api/auth/me?t=${Date.now()}`, {
+    const response = await axios.get(`https://backend-visiocraft-production.up.railway.app/api/auth/me?t=${Date.now()}`, {
       withCredentials: true,
     });
     
