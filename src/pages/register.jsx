@@ -27,11 +27,8 @@ import {
 } from '@tabler/icons-react';
 import axios from 'axios';
 
-// ======================================================================
-// 🚀 API SERVICE FUNCTIONS
-// ======================================================================
 
-const BASE_URL = "http://localhost:8080/api/auth";
+const BASE_URL = "https://backend-visiocraft-production.up.railway.app/api/auth";
 const AXIOS_CONFIG = {
     headers: { "Content-Type": "application/json" },
     withCredentials: true,
@@ -98,9 +95,6 @@ const registerFreelance = async (formData) => {
     }
 };
 
-// ======================================================================
-// 🔑 REGISTER PAGE COMPONENT
-// ======================================================================
 
 const RegisterPage = () => {
     const [role, setRole] = useState('client'); 
@@ -114,7 +108,7 @@ const RegisterPage = () => {
     useEffect(() => {
         const fetchSkills = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/skills'); 
+                const response = await axios.get('https://backend-visiocraft-production.up.railway.app/api/skills'); 
                 const skillsData = response.data.map(skill => ({
                     value: skill.name, 
                     label: skill.name, 

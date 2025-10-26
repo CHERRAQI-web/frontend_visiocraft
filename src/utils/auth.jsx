@@ -20,7 +20,7 @@ export const isAuthenticated = async () => {
 
 export const logout = async () => {
   try {
-    await axios.post("http://localhost:8080/api/auth/logout", {}, { 
+    await axios.post("https://backend-visiocraft-production.up.railway.app/api/auth/logout", {}, { 
       withCredentials: true,
       // Note : 'credentials: "include"' est redondant quand on utilise déjà 'withCredentials: true' avec axios
     });
@@ -30,6 +30,6 @@ export const logout = async () => {
     localStorage.removeItem("token");
     window.dispatchEvent(new Event("userLoggedOut"));
     localStorage.setItem("logout", Date.now());
-    window.location.href = "http://localhost:5173/login";
+    window.location.href = "https://frontend-visiocraft.vercel.app/login";
   }
 };
