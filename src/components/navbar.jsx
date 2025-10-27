@@ -247,7 +247,7 @@ const Navbar = () => {
                   </div>
                 </div>
                 
-                <div className="mt-3 space-y-1">
+                {/* <div className="mt-3 space-y-1">
                   {user.role === "Admin" && (
                     <button onClick={() => {redirectToAppWithToken('https://admin-five-pearl.vercel.app/', localStorage.getItem('token')); setIsOpen(false);}} className="w-full text-left text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700 flex items-center space-x-2">
                       <IconDashboard size={18} />
@@ -270,7 +270,7 @@ const Navbar = () => {
                     <IconLogout size={18} />
                     <span>Logout</span>
                   </button>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
