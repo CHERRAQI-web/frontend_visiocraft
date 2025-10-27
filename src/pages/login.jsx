@@ -68,7 +68,7 @@ const [isAuthenticating, setIsAuthenticating] = useState(false);
           withCredentials: true,
         }
       );
-      console.log("datad datda",response.data)
+
       const { token, user } = response.data;
       localStorage.setItem('token', token); // Ensure to store the token
       dispatch(setAuthenticated({ token, user }));
