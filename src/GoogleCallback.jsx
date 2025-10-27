@@ -23,9 +23,9 @@ const GoogleCallback = () => {
             if (response.data.user.role === 'Client') {
                 window.location.href = 'https://client-visiocraft.vercel.app/';
             } else if(response.data.user.role === 'Admin') {
-                window.location.href = 'https://admin-five-pearl.vercel.app/';
+                window.location.href = 'https://admin-visiocraft.vercel.app/';
             } else if(response.data.user.role === 'Freelancer'){
-                window.location.href = 'https://freelancer-two-tau.vercel.app/';
+                window.location.href = 'https://freelancer-visiocraft.vercel.app/';
             } else {
                 navigate('/');
             }
