@@ -1,52 +1,41 @@
-import React, { useEffect } from 'react';
+// src/GoogleCallback.jsx
+import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api'; // Utilise l'instance configurée
 
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleCallback = async () => {
-      const code = searchParams.get('code');
+    const code = searchParams.get('code');
+    if (!code) {
+      navigate('/login?auth=error');
+      return;
+    }
 
-      if (!code) {
-        console.error('No code found in URL');
-        navigate('/login?auth=error');
-        return;
-      }
-
+    const exchangeCodeForToken = async () => {
       try {
-        const response = await axios.get(`https://backend-visiocraft-production.up.railway.app/api/auth/google/callback?code=${code}`);
-    
-        if (response.data.user) {
-            if (response.data.user.role === 'Client') {
-                window.location.href = 'https://client-visiocraft.vercel.app/';
-            } else if(response.data.user.role === 'Admin') {
-                window.location.href = 'https://admin-visiocraft.vercel.app/';
-            } else if(response.data.user.role === 'Freelancer'){
-                window.location.href = 'https://freelancer-visiocraft.vercel.app/';
-            } else {
-                navigate('/');
-            }
-        } else {
-            navigate('/login?auth=error');
-        }
+        // Le frontend envoie le code au backend
+        const response = await api.get(`/auth/google/callback?code=${code}`);
+        const { token, user } = response.data;
+
+        // Le frontend reçoit le JWT et le stocke
+        localStorage.setItem('token', token);
+        console.log(response.data)
+        // Redirection finale
+        window.location.href = 'https://client-visiocraft.vercel.app/';
 
       } catch (error) {
-        console.error('Error during Google callback:', error);
+        console.error('Error exchanging code for token:', error);
         navigate('/login?auth=error');
       }
     };
 
-    handleCallback();
+    exchangeCodeForToken();
   }, [searchParams, navigate]);
 
-  return (
-    <div>
-      <h2>Authentication in progress...</h2>
-    </div>
-  );
+  return <h2>Authentication in progress...</h2>;
 };
 
 export default GoogleCallback;
