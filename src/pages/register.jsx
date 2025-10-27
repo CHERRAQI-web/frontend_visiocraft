@@ -95,6 +95,9 @@ const registerFreelance = async (formData) => {
     }
 };
 
+// ======================================================================
+// 🔑 REGISTER PAGE COMPONENT
+// ======================================================================
 
 const RegisterPage = () => {
     const [role, setRole] = useState('client'); 
