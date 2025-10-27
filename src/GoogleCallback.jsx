@@ -1,5 +1,3 @@
-// src/GoogleCallback.jsx
-
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
@@ -19,13 +17,9 @@ const GoogleCallback = () => {
       }
 
       try {
-        // Iwa n-siwewel l-backend b l-code
         const response = await axios.get(`https://backend-visiocraft-production.up.railway.app/api/auth/google/callback?code=${code}`);
-        
-        // L-backend ghadi y-jib l-token o y-redirecti l-user, ama l-a3la howa an l-backend y-t-stabbel l-user
-        // O n-directi l-user l page l-mohimma
+    
         if (response.data.user) {
-            // Ila 3endek logic dyal redirection b l-role, diriha hna
             if (response.data.user.role === 'Client') {
                 window.location.href = 'https://client-visiocraft.vercel.app/';
             } else if(response.data.user.role === 'Admin') {
