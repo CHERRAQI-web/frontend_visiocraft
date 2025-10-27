@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate,useSearchParams } from "react-router-dom";
 import {
   IconChevronDown,
   IconUser,
@@ -15,7 +15,7 @@ import { User, Briefcase, PenTool, Laptop, LogOut } from 'lucide-react';
 import { useSelector, useDispatch } from "react-redux";
 import { logout as reduxLogout, setAuthenticated } from "../store/authSlice";
 import { isAuthenticated, logout as performLogout, redirectToAppWithToken } from "../utils/auth.jsx";
-
+import axios from 'axios'
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -98,6 +98,50 @@ const Navbar = () => {
   const handleLogout = () => {
     setShouldLogout(true);
   };
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const authStatus = searchParams.get('auth');
+
+    if (authStatus === 'success') {
+      const fetchUserAfterGoogleLogin = async () => {
+        try {
+        
+          const response = await axios.get('https://backend-visiocraft-production.up.railway.app/api/auth/me/google-status', {
+            withCredentials: true 
+          });
+
+          if (response.data.user) {
+            dispatch(setAuthenticated({ 
+              token: 'cookie-based', 
+              user: response.data.user 
+            }));
+          }
+
+          window.history.replaceState({}, document.title, window.location.pathname);
+
+          if (response.data.user.role === 'Client') {
+            window.location.href = 'https://client-visiocraft.vercel.app/';
+          } else if(response.data.user.role === 'Admin') {
+            window.location.href = 'https://admin-visiocraft.vercel.app/';
+          } else if(response.data.user.role === 'Freelancer'){
+            window.location.href = 'https://freelancer-visiocraft.vercel.app/';
+          }
+
+        } catch (error) {
+          console.error("Failed to fetch user after Google login", error);
+          navigate('/login?auth=error');
+        }
+      };
+
+      fetchUserAfterGoogleLogin();
+    }
+
+    if (authStatus === 'error') {
+      navigate('/login?auth=error');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams, dispatch, navigate]);
 
   // Fonctions utilitaires pour afficher les infos de l'utilisateur
   const getUserInitials = () => {
