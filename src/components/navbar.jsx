@@ -6,7 +6,7 @@ import {
   IconMenu2,
   IconX,
   IconLogout,
-  IconSpinner, // --- NOUVEAU ---
+  IconLoader2, // --- NOUVEAU ---
   IconAlertCircle, // --- NOUVEAU ---
 } from "@tabler/icons-react";
 import { Menu, Avatar, Text, Group, UnstyledButton, Alert, Button } from "@mantine/core"; // --- NOUVEAU : Alert, Button ---
@@ -220,7 +220,7 @@ const Navbar = () => {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <span className="text-sm">Connect your Google account to enable file uploads.</span>
             <Button 
-              leftIcon={isConnecting ? <IconSpinner className="animate-spin" size={16} /> : <FaGoogle size={16} />}
+              leftIcon={isConnecting ? <IconLoader2 className="animate-spin" size={16} /> : <FaGoogle size={16} />}
               onClick={handleGoogleConnect}
               disabled={isConnecting}
               size="sm"
