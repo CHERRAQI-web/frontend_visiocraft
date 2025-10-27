@@ -14,7 +14,7 @@ import { Menu, Avatar, Text, Group, UnstyledButton, Alert } from "@mantine/core"
 import { User, Briefcase, PenTool, Laptop, LogOut } from 'lucide-react';
 import { useSelector, useDispatch } from "react-redux";
 import { logout as reduxLogout, setAuthenticated } from "../store/authSlice";
-import { isAuthenticated, logout as performLogout, redirectToAppWithToken } from "../utils/auth.jsx";
+import { isAuthenticated, logout as performLogout } from "../utils/auth.jsx";
 
 const Navbar = () => {
   const navigate = useNavigate();
