@@ -1,7 +1,7 @@
 // src/GoogleCallback.jsx
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import api from '../utils/api'; // Utilise l'instance configurée
+import api from '../src/utils/api.js'; 
 
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
