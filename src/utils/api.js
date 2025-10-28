@@ -1,15 +1,15 @@
-
 import axios from "axios";
 
 const api = axios.create({
   baseURL: 'https://backend-visiocraft-production.up.railway.app/api',
-  withCredentials: true,
+  withCredentials: true, // --- CRUCIAL : Demande au navigateur d'envoyer les cookies ---
 });
 
-// L'intercepteur pour ajouter le token n'est plus nécessaire avec les cookies,
-// mais on peut le laisser pour les requêtes qui ne sont pas de l'authentification.
+// --- IMPORTANT : Tu peux SUPPRIMER l'intercepteur qui ajoutait le header Authorization ---
+// Le navigateur s'en occupe maintenant automatiquement avec le cookie.
 api.interceptors.request.use(
   (config) => {
+    // On garde la logique pour FormData
     if (config.data instanceof FormData) {
       config.headers = { ...config.headers };
     }

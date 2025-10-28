@@ -1,9 +1,7 @@
-
 import api from "./api.js";
 
 export const isAuthenticated = async () => {
   try {
-    // Le navigateur envoie automatiquement le cookie avec la requête.
     const response = await api.get(`/auth/me?t=${Date.now()}`);
     return response.data;
   } catch (error) {
@@ -23,3 +21,4 @@ export const logout = async () => {
     window.location.href = 'https://frontend-visiocraft.vercel.app/login';
   }
 };
+
