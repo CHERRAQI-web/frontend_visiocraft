@@ -1,41 +1,32 @@
-import api from "./api.js";
+import axios from "axios";
 
-export const isAuthenticated = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-    
-    const response = await api.get(`/auth/me?t=${Date.now()}`);
-    return response.data;
-  } catch (error) {
-    console.error("Erreur dans isAuthenticated:", error);
-    return null;
-  }
-};
+const api = axios.create({
+  baseURL: 'https://backend-visiocraft-production.up.railway.app/api',
+});
 
-export const logout = async () => {
-  try {
-    await api.post("/auth/logout");
-  } catch (error) {
-    console.error("Erreur lors du logout :", error);
-  } finally {
-    localStorage.removeItem("token");
-    window.dispatchEvent(new Event("userLoggedOut"));
-    window.location.href = "https://frontend-visiocraft.vercel.app/login";
-  }
-};
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (config.data instanceof FormData) {
+      config.headers = { ...config.headers };
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// Add this missing function
-export const redirectToAppWithToken = (url, token) => {
-  if (!token) {
-    console.error("No token provided for redirection");
-    return;
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login?auth=expired';
+    }
+    return Promise.reject(error);
   }
-  
-  // Create a URL with the token as a query parameter
-  const redirectUrl = new URL(url);
-  redirectUrl.searchParams.append('token', token);
-  
-  // Redirect to the URL with the token
-  window.location.href = redirectUrl.toString();
-};
+);
+
+export default api;

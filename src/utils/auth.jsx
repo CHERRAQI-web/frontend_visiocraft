@@ -25,3 +25,17 @@ export const logout = async () => {
   }
 };
 
+// Add this missing function
+export const redirectToAppWithToken = (url, token) => {
+  if (!token) {
+    console.error("No token provided for redirection");
+    return;
+  }
+  
+  // Create a URL with the token as a query parameter
+  const redirectUrl = new URL(url);
+  redirectUrl.searchParams.append('token', token);
+  
+  // Redirect to the URL with the token
+  window.location.href = redirectUrl.toString();
+};
