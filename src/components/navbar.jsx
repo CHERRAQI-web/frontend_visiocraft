@@ -106,33 +106,33 @@ const [error,setError]=useState();
   const handleLogout = () => {
     setShouldLogout(true);
   };
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        setLoading(true);
-        const userResponse = await axios.get(
-          `${BASE_URL}/auth/me`,
-          AXIOS_CONFIG
-        );
-        setCurrentUser(userResponse.data);
-        try {
-          const statusResponse = await axios.get(
-            `${BASE_URL}/auth/me/google-status`,
-            AXIOS_CONFIG
-          );
-          setIsGoogleConnected(statusResponse.data.isConnected);
-        } catch (statusError) {
-          setIsGoogleConnected(!!userResponse.data.googleTokens);
-        }
+  // useEffect(() => {
+  //   const fetchInitialData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const userResponse = await axios.get(
+  //         `${BASE_URL}/auth/me`,
+  //         AXIOS_CONFIG
+  //       );
+  //       setCurrentUser(userResponse.data);
+  //       try {
+  //         const statusResponse = await axios.get(
+  //           `${BASE_URL}/auth/me/google-status`,
+  //           AXIOS_CONFIG
+  //         );
+  //         setIsGoogleConnected(statusResponse.data.isConnected);
+  //       } catch (statusError) {
+  //         setIsGoogleConnected(!!userResponse.data.googleTokens);
+  //       }
         
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchInitialData();
-  }, []);
+  //     } catch (err) {
+  //       setError(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchInitialData();
+  // }, []);
   // Fonctions utilitaires pour afficher les infos de l'utilisateur
   const getUserInitials = () => {
     if (!user) return "U";
