@@ -34,7 +34,14 @@ const GoogleCallback = () => {
           }));
           
           // 5. On va au salon (on redirige vers le bon dashboard)
-          window.location.href = redirectUrl;
+          // Use the redirectToAppWithToken function to pass the token
+          if (redirectUrl) {
+            const { redirectToAppWithToken } = await import('../utils/auth.jsx');
+            redirectToAppWithToken(redirectUrl, token);
+          } else {
+            // Fallback to home if no redirect URL
+            navigate('/');
+          }
         } else {
           navigate('/login?auth=error');
         }

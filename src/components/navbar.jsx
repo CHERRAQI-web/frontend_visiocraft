@@ -157,6 +157,10 @@ return user.email || user.user_id?.email || "User";
 };
 
 const getUserEmail = () => user?.email || user?.user_id?.email || "N/A";
+const getUserRole = () => {
+  if (!user) return null;
+  return user.role || user.user_id?.role;
+};
 
 // Afficher un indicateur de chargement pendant la vérification de l'authentification
 if (!authChecked) {
@@ -214,20 +218,20 @@ Visio<span className="text-teal-200">Craft</span>
 Logged in as:
 <Text fw={600} size="sm" className="text-violet-600 truncate">{getUserEmail()}</Text>
 </Menu.Label>
-{user.role === "Admin" && (
-<Menu.Item onClick={() => redirectToAppWithToken('https://admin-five-pearl.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
-Admin Dashboard
-</Menu.Item>
+{getUserRole() === "Admin" && (
+  <Menu.Item onClick={() => redirectToAppWithToken('https://admin-visiocraft.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+    Admin Dashboard
+  </Menu.Item>
 )}
-{user.role === "Freelancer" && (
-<Menu.Item onClick={() => redirectToAppWithToken('https://freelancer-two-tau.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
-Freelancer Dashboard
-</Menu.Item>
+{getUserRole() === "Freelancer" && (
+  <Menu.Item onClick={() => redirectToAppWithToken('https://freelancer-visiocraft.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+    Freelancer Dashboard
+  </Menu.Item>
 )}
-{user.role === "Client" && (
-<Menu.Item onClick={() => redirectToAppWithToken('https://client-visiocraft.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-violet-500" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
-Client Dashboard
-</Menu.Item>
+{getUserRole() === "Client" && (
+  <Menu.Item onClick={() => redirectToAppWithToken('https://client-visiocraft.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-violet-500" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+    Client Dashboard
+  </Menu.Item>
 )}
 <Menu.Item onClick={handleLogout} icon={<IconLogout size={18} className="text-red-500" />} className="text-red-600 rounded-md transition-colors duration-200 hover:bg-red-50">
 Logout
@@ -282,23 +286,20 @@ Logout
 </div>
 
 <div className="mt-3 space-y-1">
-{user.role === "Admin" && (
-<button onClick={() => {redirectToAppWithToken('https://admin-five-pearl.vercel.app/', localStorage.getItem('token')); setIsOpen(false);}} className="w-full text-left text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700 flex items-center space-x-2">
-<IconDashboard size={18} />
-<span>Admin Dashboard</span>
-</button>
+{getUserRole() === "Admin" && (
+  <Menu.Item onClick={() => redirectToAppWithToken('https://admin-visiocraft.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+    Admin Dashboard
+  </Menu.Item>
 )}
-{user.role === "Freelancer" && (
-<button onClick={() => {redirectToAppWithToken('https://freelancer-two-tau.vercel.app/', localStorage.getItem('token')); setIsOpen(false);}} className="w-full text-left text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700 flex items-center space-x-2">
-<IconDashboard size={18} />
-<span>Freelancer Dashboard</span>
-</button>
+{getUserRole() === "Freelancer" && (
+  <Menu.Item onClick={() => redirectToAppWithToken('https://freelancer-visiocraft.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+    Freelancer Dashboard
+  </Menu.Item>
 )}
-{user.role === "Client" && (
-<button onClick={() => {redirectToAppWithToken('https://client-visiocraft.vercel.app/', localStorage.getItem('token')); setIsOpen(false);}} className="w-full text-left text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700 flex items-center space-x-2">
-<IconDashboard size={18} />
-<span>Client Dashboard</span>
-</button>
+{getUserRole() === "Client" && (
+  <Menu.Item onClick={() => redirectToAppWithToken('https://client-visiocraft.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-violet-500" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+    Client Dashboard
+  </Menu.Item>
 )}
 <button onClick={() => {handleLogout(); setIsOpen(false);}} className="w-full text-left text-red-300 px-3 py-2 rounded-md text-base font-medium hover:bg-red-600 hover:text-white flex items-center space-x-2">
 <IconLogout size={18} />
