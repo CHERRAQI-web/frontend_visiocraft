@@ -2,6 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: 'https://backend-visiocraft-production.up.railway.app/api',
+  withCredentials: true, // Important pour envoyer les cookies
 });
 
 api.interceptors.request.use(
@@ -9,9 +10,6 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    }
-    if (config.data instanceof FormData) {
-      config.headers = { ...config.headers };
     }
     return config;
   },
