@@ -1,4 +1,4 @@
-// src/components/Navbar.jsx
+// src/components/Navbar.jsx (dans le projet frontend-visiocraft)
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,11 +12,10 @@ import {
 import { Menu, Avatar, Text, Group, UnstyledButton } from "@mantine/core";
 import { LogOut } from 'lucide-react';
 
-// --- CHANGEMENT : On importe nos outils partagés ---
-import api from "../utils/api.js";
-import { isAuthenticated, logout } from "../utils/auth.jsx";
+// --- CHANGEMENT : On importe nos outils partagés et Redux ---
 import { useSelector, useDispatch } from "react-redux";
 import { logout as reduxLogout, setAuthenticated } from "../store/authSlice.js";
+import { isAuthenticated, logout } from "../utils/auth.jsx"; // Utilise la version partagée
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -27,10 +26,9 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   // --- CHANGEMENT : La fonction pour vérifier l'authentification est simplifiée ---
-  // Elle utilise maintenant `isAuthenticated` de `auth.jsx` qui gère le cookie automatiquement.
   const fetchUser = useCallback(async () => {
     try {
-      const userData = await isAuthenticated();
+      const userData = await isAuthenticated(); // Utilise la fonction partagée
       if (userData) {
         dispatch(setAuthenticated({ user: userData }));
       } else {
@@ -53,25 +51,23 @@ const Navbar = () => {
   }, [fetchUser]);
 
   // --- CHANGEMENT : La fonction de logout est simplifiée ---
-  // On appelle juste la fonction `logout` partagée qui s'occupe de tout.
   const handleLogout = async () => {
-    await logout(); // Cette fonction va appeler le backend, supprimer le cookie et rediriger
-    dispatch(reduxLogout()); // On met à jour l'état Redux pour l'UI
+    await logout(); // Utilise la fonction partagée
+    dispatch(reduxLogout());
   };
 
-  // --- NOUVEAU : Fonctions utilitaires simplifiées ---
+  // --- Fonctions utilitaires simplifiées ---
   const getUserInitials = () => {
     if (!user) return "U";
-    const firstName = user.first_name;
-    const lastName = user.last_name;
-    if (firstName && lastName) return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-    return user.email.charAt(0).toUpperCase();
+    const { first_name, last_name, email } = user;
+    if (first_name && last_name) return `${first_name.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    return email.charAt(0).toUpperCase();
   };
     
   const getUserName = () => {
     if (!user) return "User";
     const { first_name, last_name, email } = user;
-    if (first_name && lastName) return `${first_name} ${lastName}`;
+    if (first_name && last_name) return `${first_name} ${lastName}`;
     return email;
   };
 
@@ -134,7 +130,6 @@ const Navbar = () => {
                   {user.role === "Admin" && (
                     <Menu.Item 
                       // --- CHANGEMENT CLÉ : On utilise `window.location.href` ---
-                      // Le navigateur enverra automatiquement le cookie partagé.
                       onClick={() => window.location.href = 'https://admin-five-pearl.vercel.app/'} 
                       icon={<IconDashboard size={18} className="text-teal-500" />} 
                       className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600"
