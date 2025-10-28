@@ -1,3 +1,5 @@
+// src/LoginPage.jsx
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -19,7 +21,7 @@ import {
   IconAlertCircle,
   IconCheck,
 } from "@tabler/icons-react";
-import axios from "axios";
+import api from "../utils/api"; // --- CHANGEMENT 1 : Importe 'api' au lieu de 'axios'
 import { setAuthenticated } from "../store/authSlice.js";
 import { useDispatch } from "react-redux";
 import { FaGoogle } from "react-icons/fa";
@@ -32,7 +34,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState(null);
 
   const validateForm = () => {
@@ -52,25 +54,19 @@ const [isAuthenticating, setIsAuthenticating] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setLoading(true); // Start loading
 
     if (!validateForm()) {
+      setLoading(false); // Stop loading if validation fails
       return;
     }
 
     try {
-      console.log("Data sent:", { email, password }); // Log the data being sent
-
-      const response = await axios.post(
-        "https://backend-visiocraft-production.up.railway.app/api/auth/login",
-        { email, password },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
+      // --- CHANGEMENT 2 : Utilise 'api' au lieu de 'axios' et supprime la config manuelle
+      const response = await api.post("/auth/login", { email, password });
 
       const { token, user } = response.data;
-      localStorage.setItem('token', token); // Ensure to store the token
+      localStorage.setItem('token', token);
       dispatch(setAuthenticated({ token, user }));
       window.dispatchEvent(new Event("userLoggedIn"));
       
@@ -84,7 +80,6 @@ const [isAuthenticating, setIsAuthenticating] = useState(false);
             window.location.href = "https://admin-five-pearl.vercel.app/";
         }else if(user.role === "Freelancer"){
             window.location.href = "https://freelancer-two-tau.vercel.app/";
-
         }else{
           navigate("/");
         }
@@ -96,6 +91,8 @@ const [isAuthenticating, setIsAuthenticating] = useState(false);
           "Login failed. Please check your credentials."
       );
       setMessageType("error");
+    } finally {
+        setLoading(false); // Stop loading in all cases
     }
   };
 
@@ -103,15 +100,16 @@ const [isAuthenticating, setIsAuthenticating] = useState(false);
     setIsAuthenticating(true);
     setError(null);
     try {
-      const response = await axios.get("https://backend-visiocraft-production.up.railway.app/api/auth/google/auth-url");
-      window.location.href = response.data.authUrl; // Redirige vers l'URL d'authentification Google
-      console.log(response.data.authUrl)
+      // --- CHANGEMENT 3 : Utilise 'api' ici aussi
+      const response = await api.get("/auth/google/auth-url");
+      window.location.href = response.data.authUrl;
     } catch (err) {
       setError("Failed to connect to Google. Please try again.");
       setIsAuthenticating(false);
     }
   };
-  // The rest of your JSX component remains the same...
+  
+  // Le reste de ton composant (le JSX) reste identique...
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
       <Paper
