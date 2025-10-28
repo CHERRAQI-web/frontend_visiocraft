@@ -46,54 +46,54 @@ const Navbar = () => {
   const [error, setError] = useState();
   const [loading, setLoading] = useState(true);
   // Fonction pour récupérer les données utilisateur avec useCallback
-  const fetchUser = useCallback(async () => {
-    try {
-      setAuthChecked(false);
-      const userData = await isAuthenticated();
+  // const fetchUser = useCallback(async () => {
+  //   try {
+  //     setAuthChecked(false);
+  //     const userData = await isAuthenticated();
 
-      if (userData) {
-        dispatch(
-          setAuthenticated({
-            user: userData,
-            token: localStorage.getItem("token"),
-          })
-        );
-      } else {
-        dispatch(reduxLogout());
-      }
-    } catch (error) {
-      console.error("Erreur de vérification d'auth:", error);
-      dispatch(reduxLogout());
-    } finally {
-      setAuthChecked(true);
-    }
-  }, [dispatch]);
+  //     if (userData) {
+  //       dispatch(
+  //         setAuthenticated({
+  //           user: userData,
+  //           token: localStorage.getItem("token"),
+  //         })
+  //       );
+  //     } else {
+  //       dispatch(reduxLogout());
+  //     }
+  //   } catch (error) {
+  //     console.error("Erreur de vérification d'auth:", error);
+  //     dispatch(reduxLogout());
+  //   } finally {
+  //     setAuthChecked(true);
+  //   }
+  // }, [dispatch]);
 
-  // useEffect pour la vérification initiale et l'écouteur d'événement
-  useEffect(() => {
-    fetchUser();
-    window.addEventListener("userLoggedIn", fetchUser);
+  // // useEffect pour la vérification initiale et l'écouteur d'événement
+  // useEffect(() => {
+  //   fetchUser();
+  //   window.addEventListener("userLoggedIn", fetchUser);
 
-    return () => {
-      window.removeEventListener("userLoggedIn", fetchUser);
-    };
-  }, [fetchUser]);
+  //   return () => {
+  //     window.removeEventListener("userLoggedIn", fetchUser);
+  //   };
+  // }, [fetchUser]);
 
-  // Synchronisation de la déconnexion sur plusieurs onglets
-  useEffect(() => {
-    const syncLogout = (event) => {
-      if (event.key === "logout") {
-        console.log("Déconnexion synchronisée depuis un autre onglet.");
-        dispatch(reduxLogout());
-        if (window.location.pathname !== "/login") {
-          navigate("/login");
-        }
-      }
-    };
+  // // Synchronisation de la déconnexion sur plusieurs onglets
+  // useEffect(() => {
+  //   const syncLogout = (event) => {
+  //     if (event.key === "logout") {
+  //       console.log("Déconnexion synchronisée depuis un autre onglet.");
+  //       dispatch(reduxLogout());
+  //       if (window.location.pathname !== "/login") {
+  //         navigate("/login");
+  //       }
+  //     }
+  //   };
 
-    window.addEventListener("storage", syncLogout);
-    return () => window.removeEventListener("storage", syncLogout);
-  }, [dispatch, navigate]);
+  //   window.addEventListener("storage", syncLogout);
+  //   return () => window.removeEventListener("storage", syncLogout);
+  // }, [dispatch, navigate]);
 
   // useEffect pour gérer la déconnexion
   useEffect(() => {
