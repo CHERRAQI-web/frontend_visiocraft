@@ -145,6 +145,32 @@ const Navbar = () => {
     };
     fetchInitialData();
   }, []);
+
+
+    useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const userStr = urlParams.get('user');
+    
+    if (token) {
+      localStorage.setItem('token', token);
+      console.log('Token saved to localStorage');
+      
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          localStorage.setItem('user', JSON.stringify(user));
+          console.log('User data saved to localStorage');
+        } catch (e) {
+          console.error('Error parsing user data', e);
+        }
+      }
+
+      
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, []); 
   // Fonctions utilitaires pour afficher les infos de l'utilisateur
   const getUserInitials = () => {
     if (!user) return "U";
