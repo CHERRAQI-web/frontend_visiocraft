@@ -34,10 +34,11 @@ const GoogleCallback = () => {
           }));
           
           // 5. On va au salon (on redirige vers le bon dashboard)
-          // Use the redirectToAppWithToken function to pass the token
+          // Create the redirect URL with token manually
           if (redirectUrl) {
-            const { redirectToAppWithToken } = await import('../utils/auth.jsx');
-            redirectToAppWithToken(redirectUrl, token);
+            const url = new URL(redirectUrl);
+            url.searchParams.append('token', token);
+            window.location.href = url.toString();
           } else {
             // Fallback to home if no redirect URL
             navigate('/');
