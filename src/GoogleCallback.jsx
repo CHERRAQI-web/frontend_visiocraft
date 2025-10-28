@@ -1,4 +1,3 @@
-// Dans GoogleCallback.js
 
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -34,8 +33,8 @@ const GoogleCallback = () => {
           }));
           
           // 5. On va au salon (on redirige vers le bon dashboard)
-          // Create the redirect URL with token manually
           if (redirectUrl) {
+            // Create the redirect URL with token
             const url = new URL(redirectUrl);
             url.searchParams.append('token', token);
             window.location.href = url.toString();
