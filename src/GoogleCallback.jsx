@@ -1,41 +1,47 @@
-// src/GoogleCallback.jsx
-import { useEffect } from 'react';
+
+import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import api from '../src/utils/api.js'; 
+import api from '../utils/api.js';
 
 const GoogleCallback = () => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const code = searchParams.get('code');
-    if (!code) {
-      navigate('/login?auth=error');
-      return;
-    }
+    const handleCallback = async () => {
+      const code = searchParams.get('code');
 
-    const exchangeCodeForToken = async () => {
+      if (!code) {
+        console.error('Authorization code missing.');
+        navigate('/login?auth=error');
+        return;
+      }
+
       try {
-        // Le frontend envoie le code au backend
-        const response = await api.get(`/auth/google/callback?code=${code}`);
-        const { token, user } = response.data;
-
-        // Le frontend reçoit le JWT et le stocke
-        localStorage.setItem('token', token);
-        console.log(response.data)
-        // Redirection finale
-        window.location.href = 'https://client-visiocraft.vercel.app/';
+        // Le seul travail de ce composant : envoyer le code au backend.
+        // Le backend va s'occuper de tout le reste (créer le token, le mettre dans un cookie, et rediriger).
+        await api.get(`/auth/google/callback?code=${code}`);
+        
+        // Si l'appel API réussit, le backend va rediriger l'utilisateur.
+        // Ce composant ne fera rien de plus.
+        console.log("Code sent to backend, waiting for redirection...");
 
       } catch (error) {
-        console.error('Error exchanging code for token:', error);
+        console.error('Error sending code to backend:', error);
+        // En cas d'erreur, on redirige vers la page de login.
         navigate('/login?auth=error');
       }
     };
 
-    exchangeCodeForToken();
+    handleCallback();
   }, [searchParams, navigate]);
 
-  return <h2>Authentication in progress...</h2>;
+  // On affiche un message de chargement pendant que le processus se fait.
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--mantine-color-gray-0)' }}>
+      <h2>Authentication in progress, please wait...</h2>
+    </div>
+  );
 };
 
 export default GoogleCallback;
