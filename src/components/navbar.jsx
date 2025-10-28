@@ -7,12 +7,20 @@ import {
   IconDashboard,
   IconMenu2,
   IconX,
+  IconBook,
+  IconAlertCircle
 } from "@tabler/icons-react";
-import { Menu, Avatar, Text, Group, UnstyledButton } from "@mantine/core";
+import { Menu, Avatar, Text, Group, UnstyledButton, Alert } from "@mantine/core";
+import { User, Briefcase, PenTool, Laptop, LogOut } from 'lucide-react';
 import { useSelector, useDispatch } from "react-redux";
 import { logout as reduxLogout, setAuthenticated } from "../store/authSlice";
-import { isAuthenticated, logout as performLogout } from "../utils/auth.jsx";
-
+import { isAuthenticated, logout as performLogout, redirectToAppWithToken } from "../utils/auth.jsx";
+import axios from 'axios';
+const BASE_URL = "https://backend-visiocraft-production.up.railway.app/api";
+const AXIOS_CONFIG = {
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+};
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -20,7 +28,10 @@ const Navbar = () => {
   const [authChecked, setAuthChecked] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [shouldLogout, setShouldLogout] = useState(false);
-
+  const [isGoogleConnected, setIsGoogleConnected] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+const [error,setError]=useState();
+  const [loading, setLoading] = useState(true);
   // Fonction pour récupérer les données utilisateur avec useCallback
   const fetchUser = useCallback(async () => {
     try {
@@ -95,31 +106,33 @@ const Navbar = () => {
   const handleLogout = () => {
     setShouldLogout(true);
   };
-
-  // Fonction pour rediriger vers les tableaux de bord selon le rôle
-  const handleDashboardRedirect = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    
-    let dashboardUrl = '';
-    switch (user?.role) {
-      case 'Admin':
-        dashboardUrl = 'https://admin-five-pearl.vercel.app/';
-        break;
-      case 'Freelancer':
-        dashboardUrl = 'https://freelancer-two-tau.vercel.app/';
-        break;
-      case 'Client':
-        dashboardUrl = 'https://client-visiocraft.vercel.app/';
-        break;
-      default:
-        return;
-    }
-    
-    // Redirection avec le token comme paramètre d'URL
-    window.location.href = `${dashboardUrl}?token=${token}`;
-  };
-
+  // useEffect(() => {
+  //   const fetchInitialData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const userResponse = await axios.get(
+  //         `${BASE_URL}/auth/me`,
+  //         AXIOS_CONFIG
+  //       );
+  //       setCurrentUser(userResponse.data);
+  //       try {
+  //         const statusResponse = await axios.get(
+  //           `${BASE_URL}/auth/me/google-status`,
+  //           AXIOS_CONFIG
+  //         );
+  //         setIsGoogleConnected(statusResponse.data.isConnected);
+  //       } catch (statusError) {
+  //         setIsGoogleConnected(!!userResponse.data.googleTokens);
+  //       }
+        
+  //     } catch (err) {
+  //       setError(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchInitialData();
+  // }, []);
   // Fonctions utilitaires pour afficher les infos de l'utilisateur
   const getUserInitials = () => {
     if (!user) return "U";
@@ -127,7 +140,6 @@ const Navbar = () => {
     const lastName = user.last_name || user.user_id?.last_name;
     const username = user.username || user.user_id?.username;
     const email = user.email || user.user_id?.email;
-    
     if (firstName && lastName) return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
     if (username) return username.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     if (email) return email.charAt(0).toUpperCase();
@@ -139,7 +151,6 @@ const Navbar = () => {
     const firstName = user.first_name || user.user_id?.first_name;
     const lastName = user.last_name || user.user_id?.last_name;
     const username = user.username || user.user_id?.username;
-    
     if (firstName && lastName) return `${firstName} ${lastName}`;
     if (username) return username;
     return user.email || user.user_id?.email || "User";
@@ -179,6 +190,7 @@ const Navbar = () => {
 
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 hover:text-teal-200">Home</Link>
+            {/* <Link to="/services" className="text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 hover:text-teal-200">Services</Link> */}
             <Link to="/contact" className="text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 hover:text-teal-200">Contact</Link>
 
             {isReduxAuthenticated && user ? (
@@ -186,11 +198,7 @@ const Navbar = () => {
                 <Menu.Target>
                   <UnstyledButton className="p-1 rounded-full transition-all duration-200 hover:bg-gray-100">
                     <Group spacing="sm">
-                      <Avatar 
-                        radius="xl" 
-                        style={{backgroundColor: "#81E6D9", color: "white"}} 
-                        className="w-8 h-8 flex items-center justify-center font-bold"
-                      >
+                      <Avatar radius="xl" style={{backgroundColor:"#81E6D9", text:"white"}} className="w-8 h-8 bg-tel-200 flex items-center justify-center font-bold text-white">
                         {getUserInitials()}
                       </Avatar>
                       <div className="hidden lg:block">
@@ -206,9 +214,19 @@ const Navbar = () => {
                     Logged in as: 
                     <Text fw={600} size="sm" className="text-violet-600 truncate">{getUserEmail()}</Text>
                   </Menu.Label>
-                  {(user.role === "Admin" || user.role === "Freelancer" || user.role === "Client") && (
-                    <Menu.Item onClick={handleDashboardRedirect} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
-                      {user.role} Dashboard
+                  {user.role === "Admin" && (
+                    <Menu.Item onClick={() => redirectToAppWithToken('https://admin-five-pearl.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+                      Admin Dashboard
+                    </Menu.Item>
+                  )}
+                  {user.role === "Freelancer" && (
+                    <Menu.Item onClick={() => redirectToAppWithToken('https://freelancer-two-tau.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-teal-200" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+                      Freelancer Dashboard
+                    </Menu.Item>
+                  )}
+                  {user.role === "Client" && (
+                    <Menu.Item onClick={() => redirectToAppWithToken('https://client-visiocraft.vercel.app/', localStorage.getItem('token'))} icon={<IconDashboard size={18} className="text-violet-500" />} className="text-gray-700 rounded-md transition-colors duration-200 hover:bg-violet-50 hover:text-violet-600">
+                      Client Dashboard
                     </Menu.Item>
                   )}
                   <Menu.Item onClick={handleLogout} icon={<IconLogout size={18} className="text-red-500" />} className="text-red-600 rounded-md transition-colors duration-200 hover:bg-red-50">
@@ -238,6 +256,7 @@ const Navbar = () => {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <div className="flex flex-col space-y-2 pb-3 border-b border-sky-500">
               <Link to="/" className="text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700" onClick={() => setIsOpen(false)}>Home</Link>
+              {/* <Link to="/services" className="text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700" onClick={() => setIsOpen(false)}>Services</Link> */}
               <Link to="/contact" className="text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700" onClick={() => setIsOpen(false)}>Contact</Link>
             </div>
             
@@ -252,11 +271,7 @@ const Navbar = () => {
               <div className="pt-3 border-t border-sky-500">
                 <div className="px-3 py-2">
                   <div className="flex items-center space-x-3">
-                    <Avatar 
-                      radius="xl" 
-                      style={{backgroundColor: "#81E6D9", color: "white"}} 
-                      className="w-10 h-10 flex items-center justify-center font-bold"
-                    >
+                    <Avatar radius="xl" style={{backgroundColor:"#81E6D9", text:"white"}} className="w-10 h-10 flex items-center justify-center font-bold text-white">
                       {getUserInitials()}
                     </Avatar>
                     <div>
@@ -267,10 +282,22 @@ const Navbar = () => {
                 </div>
                 
                 <div className="mt-3 space-y-1">
-                  {(user.role === "Admin" || user.role === "Freelancer" || user.role === "Client") && (
-                    <button onClick={() => {handleDashboardRedirect(); setIsOpen(false);}} className="w-full text-left text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700 flex items-center space-x-2">
+                  {user.role === "Admin" && (
+                    <button onClick={() => {redirectToAppWithToken('https://admin-five-pearl.vercel.app/', localStorage.getItem('token')); setIsOpen(false);}} className="w-full text-left text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700 flex items-center space-x-2">
                       <IconDashboard size={18} />
-                      <span>{user.role} Dashboard</span>
+                      <span>Admin Dashboard</span>
+                    </button>
+                  )}
+                  {user.role === "Freelancer" && (
+                    <button onClick={() => {redirectToAppWithToken('https://freelancer-two-tau.vercel.app/', localStorage.getItem('token')); setIsOpen(false);}} className="w-full text-left text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700 flex items-center space-x-2">
+                      <IconDashboard size={18} />
+                      <span>Freelancer Dashboard</span>
+                    </button>
+                  )}
+                  {user.role === "Client" && (
+                    <button onClick={() => {redirectToAppWithToken('https://client-visiocraft.vercel.app/', localStorage.getItem('token')); setIsOpen(false);}} className="w-full text-left text-white px-3 py-2 rounded-md text-base font-medium hover:bg-sky-700 flex items-center space-x-2">
+                      <IconDashboard size={18} />
+                      <span>Client Dashboard</span>
                     </button>
                   )}
                   <button onClick={() => {handleLogout(); setIsOpen(false);}} className="w-full text-left text-red-300 px-3 py-2 rounded-md text-base font-medium hover:bg-red-600 hover:text-white flex items-center space-x-2">
