@@ -80,22 +80,81 @@ const Navbar = () => {
   }, [fetchUser]);
 
   // Synchronisation de la déconnexion sur plusieurs onglets
-  useEffect(() => {
-    const syncLogout = (event) => {
-      if (event.key === "logout") {
-        console.log("Déconnexion synchronisée depuis un autre onglet.");
+useEffect(() => {
+  const handleLogoutEvent = () => {
+    console.log("Déconnexion détectée depuis une autre application");
+    localStorage.clear();
+    dispatch(reduxLogout());
+    navigate("/login");
+  };
+
+  // Écouter les événements personnalisés
+  window.addEventListener("userLoggedOut", handleLogoutEvent);
+  
+  // Écouter les changements dans localStorage
+  const handleStorageChange = (event) => {
+    if (event.key === "logout") {
+      handleLogoutEvent();
+    }
+  };
+  
+  window.addEventListener("storage", handleStorageChange);
+
+  return () => {
+    window.removeEventListener("userLoggedOut", handleLogoutEvent);
+    window.removeEventListener("storage", handleStorageChange);
+  };
+}, [dispatch, navigate]);
+
+// Modifiez votre fonction handleLogout
+const handleLogout = () => {
+  // Vider complètement le localStorage
+  localStorage.clear();
+  
+  // Déclencher l'événement de déconnexion pour la synchronisation entre onglets
+  localStorage.setItem("logout", Date.now());
+  
+  setShouldLogout(true);
+};
+
+// Ajoutez ce useEffect pour vérifier le statut d'authentification au chargement
+useEffect(() => {
+  const checkAuthStatus = async () => {
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      dispatch(reduxLogout());
+      if (window.location.pathname !== "/login") {
+        navigate("/login");
+      }
+      return;
+    }
+
+    try {
+      // Vérifier si le token est toujours valide
+      const userData = await isAuthenticated();
+      
+      if (!userData) {
         localStorage.clear();
         dispatch(reduxLogout());
         if (window.location.pathname !== "/login") {
           navigate("/login");
         }
       }
-    };
+    } catch (error) {
+      console.error("Erreur lors de la vérification de l'authentification:", error);
+      localStorage.clear();
+      dispatch(reduxLogout());
+      if (window.location.pathname !== "/login") {
+        navigate("/login");
+      }
+    }
+  };
 
-    window.addEventListener("storage", syncLogout);
-    return () => window.removeEventListener("storage", syncLogout);
-  }, [dispatch, navigate]);
-
+  if (authChecked) {
+    checkAuthStatus();
+  }
+}, [authChecked, dispatch, navigate]);
   // useEffect pour gérer la déconnexion
   useEffect(() => {
     if (shouldLogout) {
