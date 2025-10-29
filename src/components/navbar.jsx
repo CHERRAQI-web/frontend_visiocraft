@@ -176,9 +176,9 @@ useEffect(() => {
   }, [shouldLogout, dispatch, navigate]);
 
   // Fonction pour déclencher la déconnexion
-  const handleLogout = () => {
-    setShouldLogout(true);
-  };
+  // const handleLogout = () => {
+  //   setShouldLogout(true);
+  // };
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
