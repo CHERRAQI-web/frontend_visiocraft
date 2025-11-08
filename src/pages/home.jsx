@@ -59,7 +59,7 @@ const Home = () => {
 
             {/* CTAs (Button re-added) */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Link to="/poster-projet">
+                <Link to="https://client-visiocraft.vercel.app/form_project">
                     <button
                         className="w-full sm:w-auto bg-sky-600 text-white hover:bg-violet-700 px-10 py-4 rounded-full font-bold text-lg 
                                    shadow-xl shadow-violet-300/60 transform hover:scale-[1.03] transition duration-300"
